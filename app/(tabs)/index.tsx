@@ -27,20 +27,44 @@ export default function HomeScreen() {
   
   const [input, setInput] = useState('');
 
-  const addTodo = () => {
+  const addTodo = async () => {
     if (input.trim()) {
-      // setTodos([
-      //   ...todos,
-      //   { id: Date.now(), text: input.trim(), done: false },
-      // ]);
+      const res = await fetch("/todo", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: input.trim(),
+          done: false,
+          created_at: Date.now(),
+        }),
+      })
+      const data = await res.json();
+      console.log('Todo added:', data);
       setInput('');
     }
   };
 
-  const toggleTodo = (id: number) => {
-    // setTodos(todos.map(todo =>
-    //   todo.id === id ? { ...todo, done: !todo.done } : todo
-    // ));
+  const toggleTodo = async (id: number) => {
+    if (id) {
+      try {
+        const res = await fetch("/todo", {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: Number(id),
+            done: !todos.find(todo => todo.id === id)?.done,
+          }),
+        });
+        const data = await res.json();
+        console.log('Todo updated:', data);
+      } catch (err) {
+        console.error('Error updating todo:', err);
+      }
+    }
   };
 
 
